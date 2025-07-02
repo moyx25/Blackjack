@@ -9,12 +9,12 @@ function App()
   const [value, setValue] = useState(0);
   const [count, setCount] = useState(0);
   const[symbol, setSymbol] = useState(0);
-    // Esto actúa como el "loop"
+
   useEffect(() => {
     if (choice && value < 21) 
     {
       console.log("Jugando... valor actual:", value);
-      // Aquí puedes hacer cualquier lógica que necesites mientras continúa
+    
     } 
     else 
     {
@@ -27,14 +27,14 @@ function App()
   const handleHit = () => {
   const val = Math.floor(Math.random() * 13) + 1;
   const symb = Math.floor(Math.random() * 4);
-  setValue(v => v + Math.min(val, 10));  // J, Q, K valen 10
+  setValue(v => v + Math.min(val, 10));  
   setCount(c => c + 1);
   setCards(prev => [...prev, { value: val, symbol: symb }]);
 };
   
 
   const handleStand = () => { 
-    setChoice(false); // Finaliza el juego
+    setChoice(false); 
   };
   return (
       <div className='App'> 
@@ -107,6 +107,7 @@ function adjustForAces(total, aceCount) {
 
 
 
+//Card selection 
 
 function CardImage({value, symbol, pos})
 {
