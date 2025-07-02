@@ -5,25 +5,41 @@ import React, { useState, useEffect } from 'react';
 
 function App() 
 {
+  //Const for user
   const [choice, setChoice] = useState(true);
   const [value, setValue] = useState(0);
   const [count, setCount] = useState(0);
   const[symbol, setSymbol] = useState(0);
 
-  useEffect(() => {
-    if (choice && value < 21) 
-    {
-      console.log("Jugando... valor actual:", value);
-    
-    } 
-    else 
-    {
-      console.log("Juego terminado");
-    }
-  }, [choice, value]);
+  //Const for dealer
+
+
+
+
 
   const [cards, setCards] = useState([]);
 
+  //Starting cards for the user
+  useEffect(() => {
+    let initialNumberCards = 0;
+    while (initialNumberCards < 1)
+    {
+      const val = Math.floor(Math.random() * 13) + 1;
+      const symb = Math.floor(Math.random() * 4);
+      setValue(v => v + Math.min(val, 10));  
+      setCount(c => c + 1);
+      setCards(prev => [...prev, { value: val, symbol: symb }]);
+      initialNumberCards = initialNumberCards + 1
+     
+    }
+  }, []);
+
+  //Starting card for the dealer
+
+  //Working on it...
+
+
+//Hit bottom action
   const handleHit = () => {
   const val = Math.floor(Math.random() * 13) + 1;
   const symb = Math.floor(Math.random() * 4);
@@ -32,13 +48,14 @@ function App()
   setCards(prev => [...prev, { value: val, symbol: symb }]);
 };
   
-
+//Stand bottom action
   const handleStand = () => { 
     setChoice(false); 
   };
+
+//Return for the images of the cards and bottoms
   return (
       <div className='App'> 
-
       {cards.map((card, index) => (
           <CardImage 
             key={index} 
@@ -49,43 +66,21 @@ function App()
           ))}   
       {choice && value < 21 ? (
         <>
-          <button onClick={handleHit}
-          style={{
-          background: 'none',
-          border: 'none',
-          position: 'absolute',
-          top : '360px',
-          left : '35%',
-          width : '100px',
-          height: '15px',
-          cursor: 'pointer',    
-          }}> 
+          <button onClick={handleHit} //Handle buttom         
+          className={'App-hit-bottom'}>
           <img src = {hit}
           alt = "hit"
-          style={{width: '70px', height : '70px'}}
-          >
+          style={{width: '70px', height : '70px'}}>
           </img>   
           </button>
 
-          <button onClick={handleStand}
-          style={{
-          background: 'none',
-          border: 'none',
-          position: 'absolute',
-          top : '363px',
-          left : '28%',
-          width : '100px',
-          height: '18px',
-          cursor: 'pointer',  
-          }}>      
+          <button onClick={handleStand} //Stand buttom
+          className={'App-stand-bottom'}>     
           <img src = {stand}
           alt = "stand"
-          style={{width: '70px', height : '64px'}}
-          >
+          style={{width: '70px', height : '64px'}}>
           </img>        
-          </button>  
-
-            
+          </button>            
         </>
       ) : (
         <p className = "App-end-text">        
@@ -96,7 +91,7 @@ function App()
   ) 
 }
 
-
+//Working on it....
 function adjustForAces(total, aceCount) {
   while (total > 21 && aceCount > 0) {
     total -= 10;
@@ -108,6 +103,8 @@ function adjustForAces(total, aceCount) {
 
 
 //Card selection 
+//All the card and values with their respective images
+//Surely there was a way to make it way shorter lol
 
 function CardImage({value, symbol, pos})
 {
