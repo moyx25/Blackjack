@@ -22,8 +22,8 @@ function App()
     let initialNumberCards = 0;
     while (initialNumberCards < 1)
     {
-      const val = Math.floor(Math.random() * 13) + 1;
-      const symb = Math.floor(Math.random() * 4);
+      let val = Math.floor(Math.random() * 13) + 1;
+      let symb = Math.floor(Math.random() * 4);
       setValue(v => v + Math.min(val, 10));  
       setCount(c => c + 1);
       setCards(prev => [...prev, { value: val, symbol: symb }]);
@@ -34,8 +34,8 @@ function App()
 
   //Starting card for the dealer
   useEffect(() => {
-    const val = Math.floor(Math.random() * 13) + 1;
-    const symb = Math.floor(Math.random() * 4);
+    let val = Math.floor(Math.random() * 13) + 1;
+    let symb = Math.floor(Math.random() * 4);
     setDealerValue(v => v + Math.min(val, 10));  
     setDealerCount(c => c + 1);
     setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
@@ -44,8 +44,8 @@ function App()
 //Hit bottom action
   const handleHit = () => 
 {
-  const val = Math.floor(Math.random() * 13) + 1;
-  const symb = Math.floor(Math.random() * 4);
+  let val = Math.floor(Math.random() * 13) + 1;
+  let symb = Math.floor(Math.random() * 4);
   setValue(v => v + Math.min(val, 10));  
   setCount(c => c + 1);
   setCards(prev => [...prev, { value: val, symbol: symb }]);
@@ -53,28 +53,22 @@ function App()
   
 
 //Stand bottom action
-  const handleStand = () => { 
-    setChoice(false); 
+  const handleStand = () => {
+  setChoice(false);
 
-    //Turn of the dealer
-    const dealerTurn = (currentValue) => {
-    if (currentValue < value && currentValue < 22) {
-      const val = Math.floor(Math.random() * 13) + 1;
-      const symb = Math.floor(Math.random() * 4);
-      const addedVal = Math.min(val, 10);
-      const newValue = currentValue + addedVal;
+  let current = dealerValue;
+    //Dealer's turn
+  while (current < value && current < 22) {
+    let val = Math.floor(Math.random() * 13) + 1;
+    let symb = Math.floor(Math.random() * 4);
+    let addedVal = Math.min(val, 10);
+    current += addedVal;
 
-      setDealerValue(v => v + addedVal);
-      setDealerCount(c => c + 1);
-      setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
-
-      setTimeout(dealerTurn, 700);
-      return currentValue + addedVal;
-    }
-  };
-
-  dealerTurn(dealerValue);
-  };
+    setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
+    setDealerCount(c => c + 1);
+  }
+  setDealerValue(current);
+};
 
 //Return for the images of the cards and bottoms
   return (
@@ -138,6 +132,14 @@ function App()
       <p className="App-end-text">
         ¡You won!🎉
         </p>         
+    ): dealerValue === value?(
+      <p className="App-end-text">
+        ¡Draw!
+      </p>   
+    ): dealerValue === 21?(
+      <p className="App-end-text">
+        ¡You lost!
+      </p>    
     ):( 
         <p className = "App-end-text">        
           Game Over!
