@@ -9,14 +9,12 @@ function App()
   const [choice, setChoice] = useState(true);
   const [value, setValue] = useState(0);
   const [count, setCount] = useState(0);
-  const[symbol, setSymbol] = useState(0);
-
+  
   //Const for dealer
 
   const [dealerCards, setDealerCards] = useState([]);
   const [dealerValue, setDealerValue] = useState(0);
   const [dealerCount, setDealerCount] = useState(0);
-
   const [cards, setCards] = useState([]);
 
   //Starting cards for the user
@@ -43,9 +41,6 @@ function App()
     setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
   }, []);
 
-  //Working on it...
-
-
 //Hit bottom action
   const handleHit = () => 
 {
@@ -56,9 +51,29 @@ function App()
   setCards(prev => [...prev, { value: val, symbol: symb }]);
 };
   
+
 //Stand bottom action
   const handleStand = () => { 
     setChoice(false); 
+
+    //Turn of the dealer
+    const dealerTurn = (currentValue) => {
+    if (currentValue < value && currentValue < 22) {
+      const val = Math.floor(Math.random() * 13) + 1;
+      const symb = Math.floor(Math.random() * 4);
+      const addedVal = Math.min(val, 10);
+      const newValue = currentValue + addedVal;
+
+      setDealerValue(v => v + addedVal);
+      setDealerCount(c => c + 1);
+      setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
+
+      setTimeout(dealerTurn, 700);
+      return currentValue + addedVal;
+    }
+  };
+
+  dealerTurn(dealerValue);
   };
 
 //Return for the images of the cards and bottoms
@@ -107,7 +122,23 @@ function App()
           </img>        
           </button>            
         </>
-      ) : (
+      ) : value === 21 ?(
+        <p className="App-end-text">
+        ¡You won!🎉
+        </p>
+      ) : value > dealerValue && value < 21?(
+        <p className="App-end-text">
+        ¡You won!🎉
+        </p>
+      ) : value < dealerValue && dealerValue < 21?(
+        <p className="App-end-text">
+        ¡You lost!
+        </p>     
+      ): dealerValue > 21?(
+      <p className="App-end-text">
+        ¡You won!🎉
+        </p>         
+    ):( 
         <p className = "App-end-text">        
           Game Over!
         </p>
@@ -125,14 +156,6 @@ function adjustForAces(total, aceCount) {
   return { total, aceCount };
 }
 
-
-
-//Function to generate card
-function generateCard() {
-  const value = Math.floor(Math.random() * 13) + 1;
-  const symbol = Math.floor(Math.random() * 4);
-  return { value, symbol };
-}
 
 //Card selection 
 //All the card and values with their respective images
