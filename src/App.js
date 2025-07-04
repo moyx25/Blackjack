@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 
 function App() 
 {
+  // Game control
+  const [gameStarted, setGameStarted] = useState(false);
   //Const for user
   const [choice, setChoice] = useState(true);
   const [value, setValue] = useState(0);
@@ -70,7 +72,10 @@ function App()
   setDealerValue(current);
 };
 
-//Return for the images of the cards and bottoms
+
+
+
+function renderGame() {
   return (
       <div className='App'> 
       {cards.map((card, index) => (  //Return for user
@@ -146,8 +151,26 @@ function App()
         </p>
       )}
     </div>
-  ) 
+  );
 }
+
+//Return for the images of the cards and bottoms
+return (
+  <>
+    {!gameStarted ? (
+      <div className="App">
+        <h1>Welcome to Blackjack!</h1>
+        <button onClick={() => setGameStarted(true)} className="App-start-button">
+          Start Game
+        </button>
+      </div>
+    ) : (
+      renderGame()
+    )}
+  </>
+);
+}
+
 
 //Working on it....
 function adjustForAces(total, aceCount) {
