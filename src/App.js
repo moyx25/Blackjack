@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 
 function App() 
 {
+  // Game control
+  const [gameStarted, setGameStarted] = useState(false);
   //Const for user
   const [choice, setChoice] = useState(true);
   const [value, setValue] = useState(0);
@@ -41,6 +43,76 @@ function App()
     setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
   }, []);
 
+// Luigi Casino background music effect
+useEffect(() => {
+  const luigiMusic = new Audio('/music/LuigiCasinoMusic.mp3');
+  luigiMusic.loop = true; // Loops music
+  luigiMusic.volume = 0.5; //Volume Level
+
+  // start the music on the first user click anywhere
+  const playAudio = () => {
+    luigiMusic.play().catch((e) => {
+      console.log("Still blocked even after click:", e);
+    });
+    window.removeEventListener("click", playAudio);
+  };
+
+  window.addEventListener("click", playAudio);
+
+  // cleanup on unmount
+  return () => {
+    luigiMusic.pause();
+    luigiMusic.currentTime = 0; //Restart song from start
+    window.removeEventListener("click", playAudio);
+  };
+}, []);
+  
+// Luigi voice lines
+
+useEffect(() => {
+  // Create Audio objects for Luigi's voice
+  const luigiWinSound = new Audio('/sound effects/Luigi Oh Yeah.mp3');
+  const luigiLoseSound = new Audio('/sound effects/Luigi Oh No.mp3');
+
+  // Check if the game should play a win or lose sound.
+  // This is separate from only looking at "choice" so that busts are handled too
+  const playerBusted = value > 21; 
+  const playerBlackjack = value === 21; 
+  const dealerBusted = dealerValue > 21; 
+  const dealerWins = (dealerValue > value && dealerValue <= 21); 
+  const playerWins = (value > dealerValue && value <= 21); 
+  
+  // useEffect will run after any render where these numbers change
+
+  if (playerBusted) {
+    // player busts, definite loss
+    luigiLoseSound.play().catch((e) => {
+      console.log("Luigi Lose sound blocked by browser:", e);
+    });
+  } else if (playerBlackjack) {
+    // player immediate win
+    luigiWinSound.play().catch((e) => {
+      console.log("Luigi Win sound blocked by browser:", e);
+    });
+  } else if (!choice) {
+    // player clicked Stand, so dealer finishes
+    if (dealerBusted || playerWins) {
+      // if dealer busts or player wins after stand
+      luigiWinSound.play().catch((e) => {
+        console.log("Luigi Win sound blocked by browser:", e);
+      });
+    } else if (dealerWins) {
+      // dealer wins after stand
+      luigiLoseSound.play().catch((e) => {
+        console.log("Luigi Lose sound blocked by browser:", e);
+      });
+    }
+    // note: ties (draws) do not play a sound, you could add one if wanted
+  }
+  
+  // the effect depends on these
+}, [choice, value, dealerValue]);
+  
 //Hit bottom action
   const handleHit = () => 
 {
@@ -70,7 +142,10 @@ function App()
   setDealerValue(current);
 };
 
-//Return for the images of the cards and bottoms
+
+
+
+function renderGame() {
   return (
       <div className='App'> 
       {cards.map((card, index) => (  //Return for user
@@ -146,8 +221,26 @@ function App()
         </p>
       )}
     </div>
-  ) 
+  );
 }
+
+//Return for the images of the cards and bottoms
+return (
+  <>
+    {!gameStarted ? (
+      <div className="App">
+        <h1>Welcome to Blackjack!</h1>
+        <button onClick={() => setGameStarted(true)} className="App-start-button">
+          Start Game
+        </button>
+      </div>
+    ) : (
+      renderGame()
+    )}
+  </>
+);
+}
+
 
 //Working on it....
 function adjustForAces(total, aceCount) {
