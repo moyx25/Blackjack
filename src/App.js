@@ -13,11 +13,13 @@ function App()
   const [count, setCount] = useState(0);
   
   //Const for dealer
-
   const [dealerCards, setDealerCards] = useState([]);
   const [dealerValue, setDealerValue] = useState(0);
   const [dealerCount, setDealerCount] = useState(0);
   const [cards, setCards] = useState([]);
+
+  //Const for dealer turn finished
+  const [dealerFinished, setDealerFinished] = useState(false);
 
   //Starting cards for the user
   useEffect(() => {
@@ -70,48 +72,37 @@ useEffect(() => {
 // Luigi voice lines
 
 useEffect(() => {
-  // Create Audio objects for Luigi's voice
+  if (!dealerFinished) return; 
+
   const luigiWinSound = new Audio('/sound effects/Luigi Oh Yeah.mp3');
   const luigiLoseSound = new Audio('/sound effects/Luigi Oh No.mp3');
 
-  // Check if the game should play a win or lose sound.
-  // This is separate from only looking at "choice" so that busts are handled too
-  const playerBusted = value > 21; 
-  const playerBlackjack = value === 21; 
-  const dealerBusted = dealerValue > 21; 
-  const dealerWins = (dealerValue > value && dealerValue <= 21); 
-  const playerWins = (value > dealerValue && value <= 21); 
-  
-  // useEffect will run after any render where these numbers change
+  const playerBusted = value > 21;
+  const playerBlackjack = value === 21;
+  const dealerBusted = dealerValue > 21;
+  const dealerWins = (dealerValue > value && dealerValue <= 21);
+  const playerWins = (value > dealerValue && value <= 21);
 
   if (playerBusted) {
-    // player busts, definite loss
     luigiLoseSound.play().catch((e) => {
       console.log("Luigi Lose sound blocked by browser:", e);
     });
   } else if (playerBlackjack) {
-    // player immediate win
     luigiWinSound.play().catch((e) => {
       console.log("Luigi Win sound blocked by browser:", e);
     });
   } else if (!choice) {
-    // player clicked Stand, so dealer finishes
     if (dealerBusted || playerWins) {
-      // if dealer busts or player wins after stand
       luigiWinSound.play().catch((e) => {
         console.log("Luigi Win sound blocked by browser:", e);
       });
     } else if (dealerWins) {
-      // dealer wins after stand
       luigiLoseSound.play().catch((e) => {
         console.log("Luigi Lose sound blocked by browser:", e);
       });
     }
-    // note: ties (draws) do not play a sound, you could add one if wanted
   }
-  
-  // the effect depends on these
-}, [choice, value, dealerValue]);
+}, [dealerFinished]);
   
 //Hit bottom action
   const handleHit = () => 
@@ -124,26 +115,61 @@ useEffect(() => {
 };
   
 
-//Stand bottom action
-  const handleStand = () => {
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Stand bottom 
+const handleStand = async () => {
   setChoice(false);
 
+  
+  if (value > 21) {
+    const luigiLoseSound = new Audio('/sound effects/Luigi Oh No.mp3');
+    luigiLoseSound.play().catch((e) => console.log("Sound blocked:", e));
+    setDealerFinished(true);
+    return;
+  }
+
   let current = dealerValue;
-    //Dealer's turn
+  let dealerHand = [...dealerCards];
+
   while (current < value && current < 22) {
+    await delay(1200); 
+
     let val = Math.floor(Math.random() * 13) + 1;
     let symb = Math.floor(Math.random() * 4);
     let addedVal = Math.min(val, 10);
     current += addedVal;
 
-    setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
-    setDealerCount(c => c + 1);
+    dealerHand.push({ value: val, symbol: symb });
+    setDealerCards([...dealerHand]);
+    setDealerCount(dealerHand.length);
+    setDealerValue(current);
   }
-  setDealerValue(current);
+
+  const luigiWinSound = new Audio('/sound effects/Luigi Oh Yeah.mp3');
+  const luigiLoseSound = new Audio('/sound effects/Luigi Oh No.mp3');
+
+  const dealerBusted = current > 21;
+  const dealerWins = current > value && current <= 21;
+  const playerWins = value > current && value <= 21;
+  const draw = value === current;
+
+  if (dealerBusted || playerWins) {
+    luigiWinSound.play().catch(e => console.log("Sound blocked:", e));
+  } else if (dealerWins || value > 21) {
+    luigiLoseSound.play().catch(e => console.log("Sound blocked:", e));
+  }
+
+  setDealerFinished(true);
 };
 
 
-
+//Detect when user goes above 21
+useEffect(() => {
+  if (value > 21 && choice) {
+    handleStand();
+  }
+}, [value, choice]);
 
 function renderGame() {
   return (
@@ -191,7 +217,8 @@ function renderGame() {
           </img>        
           </button>            
         </>
-      ) : value === 21 ?(
+      ) : dealerFinished ?(
+        value === 21 ?(
         <p className="App-end-text">
         ¡You won!🎉
         </p>
@@ -219,7 +246,8 @@ function renderGame() {
         <p className = "App-end-text">        
           Game Over!
         </p>
-      )}
+      )
+      ) : null}
     </div>
   );
 }
