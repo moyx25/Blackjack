@@ -79,6 +79,52 @@ useEffect(() => {
     setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
   }, []);
 
+//Adjustment for A value
+
+//User
+useEffect(() => {
+  let total = 0;
+  let aceCount = 0;
+
+  for (const card of cards) {
+    if (card.value === 1) {
+      total += 11;
+      aceCount += 1;
+    } else {
+      total += Math.min(card.value, 10);
+    }
+  }
+
+  while (total > 21 && aceCount > 0) {
+    total -= 10;
+    aceCount--;
+  }
+
+  setValue(total);
+}, [cards]);
+
+// Dealer
+useEffect(() => {
+  let total = 0;
+  let aceCount = 0;
+
+  for (const card of dealerCards) {
+    if (card.value === 1) {
+      total += 11;
+      aceCount += 1;
+    } else {
+      total += Math.min(card.value, 10);
+    }
+  }
+
+  while (total > 21 && aceCount > 0) {
+    total -= 10;
+    aceCount--;
+  }
+
+  setDealerValue(total);
+}, [dealerCards]);
+
 // Luigi Casino background music effect
 useEffect(() => {
   const luigiMusic = new Audio('/music/LuigiCasinoMusic.mp3');
@@ -133,7 +179,6 @@ useEffect(() => {
 {
   let val = Math.floor(Math.random() * 13) + 1;
   let symb = Math.floor(Math.random() * 4);
-  setValue(v => v + Math.min(val, 10));  
   setCount(c => c + 1);
   setCards(prev => [...prev, { value: val, symbol: symb }]);
 };
@@ -158,7 +203,6 @@ const handleReset = () => {
   let val2 = Math.floor(Math.random() * 13) + 1;
   let symb2 = Math.floor(Math.random() * 4);
 
-  setValue(Math.min(val1, 10) + Math.min(val2, 10));
   setCount(2);
   setCards([
     { value: val1, symbol: symb1 },
@@ -168,7 +212,6 @@ const handleReset = () => {
   // Repartir carta al dealer
   let dealerVal = Math.floor(Math.random() * 13) + 1;
   let dealerSymb = Math.floor(Math.random() * 4);
-  setDealerValue(Math.min(dealerVal, 10));
   setDealerCount(1);
   setDealerCards([{ value: dealerVal, symbol: dealerSymb }]);
 };
@@ -179,35 +222,55 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const handleStand = async () => {
   setChoice(false);
 
-  
   if (value > 21) {
     playSound('/sound effects/Luigi Oh No.mp3');
     setDealerFinished(true);
     return;
   }
 
-  let current = dealerValue;
   let dealerHand = [...dealerCards];
+  let total = 0;
+  let aceCount = 0;
 
-  while (current < value && current < 22) {
-    await delay(1200); 
-
-    let val = Math.floor(Math.random() * 13) + 1;
-    let symb = Math.floor(Math.random() * 4);
-    let addedVal = Math.min(val, 10);
-    current += addedVal;
-
-    dealerHand.push({ value: val, symbol: symb });
-    setDealerCards([...dealerHand]);
-    setDealerCount(dealerHand.length);
-    setDealerValue(current);
+  for (const card of dealerHand) {
+    if (card.value === 1) {
+      total += 11;
+      aceCount++;
+    } else {
+      total += Math.min(card.value, 10);
+    }
   }
 
-  const dealerBusted = current > 21;
-  const dealerWins = current > value && current <= 21;
-  const playerWins = value > current && value <= 21;
-  const draw = value === current;
+  while (total < value && total < 21) {
+    await delay(1200);
+    let val = Math.floor(Math.random() * 13) + 1;
+    let symb = Math.floor(Math.random() * 4);
+    dealerHand.push({ value: val, symbol: symb });
 
+    if (val === 1) {
+      total += 11;
+      aceCount++;
+    } else {
+      total += Math.min(val, 10);
+    }
+
+    // Ajustar A's si es necesario
+    while (total > 21 && aceCount > 0) {
+      total -= 10;
+      aceCount--;
+    }
+
+    setDealerCards([...dealerHand]);
+    setDealerCount(dealerHand.length);
+  }
+
+  // Ajustar por última vez por si ya no entra al loop
+  while (total > 21 && aceCount > 0) {
+    total -= 10;
+    aceCount--;
+  }
+
+  setDealerValue(total);
   setDealerFinished(true);
 };
 
@@ -267,13 +330,25 @@ function renderGame() {
         </>
       ) : dealerFinished ?(
         <>
-        {value === 21 ?(
+        {value === 21 && dealerValue === 21 ?(
+        <img
+        src = {draw}
+        alt = 'draw'
+        className={'App-result-text'}
+        />
+        ): value === 21 ?(
         <img
         src = {win}
         alt = 'youwon'
         className={'App-result-text'}
         />
-      ) : value > dealerValue && value < 21?(
+      ) : dealerValue === 21?(
+      <img
+        src = {loss}
+        alt = 'youlost'
+        className={'App-result-text'}
+        />   
+        ): value > dealerValue && value < 21?(
         <img
         src = {win}
         alt = 'youwon'
@@ -297,13 +372,7 @@ function renderGame() {
         alt = 'draw'
         className={'App-result-text'}
         />   
-      ): dealerValue === 21?(
-      <img
-        src = {loss}
-        alt = 'youlost'
-        className={'App-result-text'}
-        />   
-    ):( 
+      ):( 
         <img
         src = {loss}
         alt = 'youlost'
@@ -338,17 +407,6 @@ return (
   </>
 );
 }
-
-
-//Working on it....
-function adjustForAces(total, aceCount) {
-  while (total > 21 && aceCount > 0) {
-    total -= 10;
-    aceCount--;
-  }
-  return { total, aceCount };
-}
-
 
 //Card selection 
 //All the card and values with their respective images
