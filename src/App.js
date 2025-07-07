@@ -1,10 +1,44 @@
 import stand from './stand.png';
 import hit from './hit.png';
+import reset from './reset.png';
+import win from './youwon.png';
+import loss from './youlost.png';
+import draw from './draw.png';
 import './App.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
+
 
 function App() 
 {
+  const luigiSoundRef = useRef(null);
+  const audioCache = useRef({});
+
+useEffect(() => {
+  const sounds = {
+    win: '/sound effects/Luigi Oh Yeah.mp3',
+    lose: '/sound effects/Luigi Oh No.mp3',
+  };
+
+  for (const [key, src] of Object.entries(sounds)) {
+    const audio = new Audio(src);
+    audio.load(); // precarga el audio
+    audioCache.current[key] = audio;
+  }
+}, []);
+
+  const playSound = (src) => {
+  if (luigiSoundRef.current) {
+    luigiSoundRef.current.pause();
+    luigiSoundRef.current.currentTime = 0;
+  }
+
+  // Usa el audio cacheado si existe
+  const cached = Object.values(audioCache.current).find(a => a.src.includes(src));
+  const sound = cached ? cached.cloneNode() : new Audio(src);
+
+  luigiSoundRef.current = sound;
+  sound.play().catch(e => console.log("Sound blocked:", e));
+};
   // Game control
   const [gameStarted, setGameStarted] = useState(false);
   //Const for user
@@ -72,37 +106,27 @@ useEffect(() => {
 // Luigi voice lines
 
 useEffect(() => {
-  if (!dealerFinished) return; 
-
-  const luigiWinSound = new Audio('/sound effects/Luigi Oh Yeah.mp3');
-  const luigiLoseSound = new Audio('/sound effects/Luigi Oh No.mp3');
+  if (!dealerFinished || choice) return;
 
   const playerBusted = value > 21;
   const playerBlackjack = value === 21;
   const dealerBusted = dealerValue > 21;
-  const dealerWins = (dealerValue > value && dealerValue <= 21);
-  const playerWins = (value > dealerValue && value <= 21);
+  const dealerWins = dealerValue > value && dealerValue <= 21;
+  const playerWins = value > dealerValue && value <= 21;
 
-  if (playerBusted) {
-    luigiLoseSound.play().catch((e) => {
-      console.log("Luigi Lose sound blocked by browser:", e);
-    });
-  } else if (playerBlackjack) {
-    luigiWinSound.play().catch((e) => {
-      console.log("Luigi Win sound blocked by browser:", e);
-    });
-  } else if (!choice) {
-    if (dealerBusted || playerWins) {
-      luigiWinSound.play().catch((e) => {
-        console.log("Luigi Win sound blocked by browser:", e);
-      });
-    } else if (dealerWins) {
-      luigiLoseSound.play().catch((e) => {
-        console.log("Luigi Lose sound blocked by browser:", e);
-      });
-    }
+  const src =
+    playerBusted || dealerWins
+      ? '/sound effects/Luigi Oh No.mp3'
+      : (playerBlackjack || playerWins || dealerBusted)
+      ? '/sound effects/Luigi Oh Yeah.mp3'
+      : null;
+
+  if (src) {
+    playSound (src);
   }
-}, [dealerFinished]);
+
+}, [dealerFinished, value, dealerValue, choice]);
+
   
 //Hit bottom action
   const handleHit = () => 
@@ -114,6 +138,40 @@ useEffect(() => {
   setCards(prev => [...prev, { value: val, symbol: symb }]);
 };
   
+//Reset buttom
+const handleReset = () => {
+ if (luigiSoundRef.current) {
+  luigiSoundRef.current.pause();
+  luigiSoundRef.current.currentTime = 0;
+}
+  setChoice(true);
+  setValue(0);
+  setCount(0);
+  setDealerCards([]);
+  setDealerValue(0);
+  setDealerCount(0);
+  setCards([]);
+  setDealerFinished(false);  
+
+  let val1 = Math.floor(Math.random() * 13) + 1;
+  let symb1 = Math.floor(Math.random() * 4);
+  let val2 = Math.floor(Math.random() * 13) + 1;
+  let symb2 = Math.floor(Math.random() * 4);
+
+  setValue(Math.min(val1, 10) + Math.min(val2, 10));
+  setCount(2);
+  setCards([
+    { value: val1, symbol: symb1 },
+    { value: val2, symbol: symb2 }
+  ]);
+
+  // Repartir carta al dealer
+  let dealerVal = Math.floor(Math.random() * 13) + 1;
+  let dealerSymb = Math.floor(Math.random() * 4);
+  setDealerValue(Math.min(dealerVal, 10));
+  setDealerCount(1);
+  setDealerCards([{ value: dealerVal, symbol: dealerSymb }]);
+};
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -123,8 +181,7 @@ const handleStand = async () => {
 
   
   if (value > 21) {
-    const luigiLoseSound = new Audio('/sound effects/Luigi Oh No.mp3');
-    luigiLoseSound.play().catch((e) => console.log("Sound blocked:", e));
+    playSound('/sound effects/Luigi Oh No.mp3');
     setDealerFinished(true);
     return;
   }
@@ -146,19 +203,10 @@ const handleStand = async () => {
     setDealerValue(current);
   }
 
-  const luigiWinSound = new Audio('/sound effects/Luigi Oh Yeah.mp3');
-  const luigiLoseSound = new Audio('/sound effects/Luigi Oh No.mp3');
-
   const dealerBusted = current > 21;
   const dealerWins = current > value && current <= 21;
   const playerWins = value > current && value <= 21;
   const draw = value === current;
-
-  if (dealerBusted || playerWins) {
-    luigiWinSound.play().catch(e => console.log("Sound blocked:", e));
-  } else if (dealerWins || value > 21) {
-    luigiLoseSound.play().catch(e => console.log("Sound blocked:", e));
-  }
 
   setDealerFinished(true);
 };
@@ -166,7 +214,7 @@ const handleStand = async () => {
 
 //Detect when user goes above 21
 useEffect(() => {
-  if (value > 21 && choice) {
+  if ((value >= 21) && choice) {
     handleStand();
   }
 }, [value, choice]);
@@ -215,38 +263,60 @@ function renderGame() {
           alt = "stand"
           style={{width: '70px', height : '64px'}}>
           </img>        
-          </button>            
+          </button>        
         </>
       ) : dealerFinished ?(
-        value === 21 ?(
-        <p className="App-end-text">
-        ¡You won!🎉
-        </p>
+        <>
+        {value === 21 ?(
+        <img
+        src = {win}
+        alt = 'youwon'
+        className={'App-result-text'}
+        />
       ) : value > dealerValue && value < 21?(
-        <p className="App-end-text">
-        ¡You won!🎉
-        </p>
+        <img
+        src = {win}
+        alt = 'youwon'
+        className={'App-result-text'}
+        />
       ) : value < dealerValue && dealerValue < 21?(
-        <p className="App-end-text">
-        ¡You lost!
-        </p>     
+        <img
+        src = {loss}
+        alt = 'youlost'
+        className={'App-result-text'}
+        />     
       ): dealerValue > 21?(
-      <p className="App-end-text">
-        ¡You won!🎉
-        </p>         
-    ): dealerValue === value?(
-      <p className="App-end-text">
-        ¡Draw!
-      </p>   
-    ): dealerValue === 21?(
-      <p className="App-end-text">
-        ¡You lost!
-      </p>    
+      <img
+        src = {win}
+        alt = 'youwon'
+        className={'App-result-text'}
+        />        
+      ): dealerValue === value?(
+      <img
+        src = {draw}
+        alt = 'draw'
+        className={'App-result-text'}
+        />   
+      ): dealerValue === 21?(
+      <img
+        src = {loss}
+        alt = 'youlost'
+        className={'App-result-text'}
+        />   
     ):( 
-        <p className = "App-end-text">        
-          Game Over!
-        </p>
-      )
+        <img
+        src = {loss}
+        alt = 'youlost'
+        className={'App-result-text'}/> 
+      )}
+      <button onClick={handleReset}  //Reset buttom
+          className={'App-reset-bottom'}>
+          <img src = {reset}
+          alt = "reset"
+          style={{width: '70px', height : '64 px'}}>
+          </img>
+          </button>   
+      </>    
       ) : null}
     </div>
   );
@@ -287,7 +357,7 @@ function adjustForAces(total, aceCount) {
 function CardImage({value, symbol, pos})
 {
     const gameOver = value > 21 || !value;
-    const position = 600 + pos;
+    const position = 640 + pos;
    if (value === 1 && symbol === 0)
    {
     return(
@@ -971,7 +1041,7 @@ function CardImage({value, symbol, pos})
 //I did a different section because they need to be located at a different height linked to App-cards-dealer
  function CardImageDealer({value,symbol,pos})
  {
-    const position = 600 + pos;
+    const position = 640 + pos;
    if (value === 1 && symbol === 0)
    {
     return(

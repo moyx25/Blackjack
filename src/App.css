@@ -16,8 +16,21 @@
 .App-hit-bottom
 {
   position: absolute;
-  top: 360px;
-  left: 50%;
+  top: 357px;
+  left: 25%;
+  transform: translateX(70px);
+  width: 100px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.App-reset-bottom
+{
+  position: absolute;
+  top: 380px;
+  left: 28%;
   transform: translateX(70px);
   width: 100px;
   height: 40px;
@@ -42,7 +55,7 @@
 .App-card-user
 {
   position: absolute;
-  top: 400px;
+  top: 380px;
   left: 50%;
   transform: translateX(-50%);
   height: 120px;
@@ -62,15 +75,12 @@
   opacity: 0;
 }
 
-.App-end-text
+.App-result-text
 {
   position: absolute;
-  top: 340px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-weight: bold;
-  color: black;
-  font-size: 30px;
+  top: 230px;
+  left: 44%;
+  height: 150px;
   /*
   display: flex;
   position: absolute;
