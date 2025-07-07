@@ -322,7 +322,7 @@ function renderGame() {
   );
 }
 
-//Return for the images of the cards and bottoms
+//Return for the images of the cards and buttoms
 return (
   <>
     {!gameStarted ? (
