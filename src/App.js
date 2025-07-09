@@ -173,6 +173,24 @@ useEffect(() => {
 
 }, [dealerFinished, value, dealerValue, choice]);
 
+// Card SFX
+useEffect(() => {
+  const cardSound = new Audio('/sound effects/CardSFX.mp3');
+  cardSound.play().catch(() => {});
+}, [count, dealerCount]);
+
+//DraW SFX
+
+useEffect(() => {
+  if (!dealerFinished || choice) return;
+
+  const isDraw = value === dealerValue;
+
+  if (isDraw) {
+    playSound('/sound effects/Luigi Okey-Dokey.mp3');
+  }
+}, [dealerFinished, value, dealerValue, choice]);
+
   
 //Hit bottom action
   const handleHit = () => 
