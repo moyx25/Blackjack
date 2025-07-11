@@ -102,8 +102,8 @@ html, body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 20px;
-  margin-left: 170px;
+  margin-top: -100px;
+  margin-left: 110px;
 }
 
 .App-start-button:hover {
@@ -156,8 +156,11 @@ html, body {
   color: white;
 }
 
-.App-welcome-screen h1 {
-  font-size: 48px;
-  margin-bottom: 30px;
-  color: white;
+.App-welcome-word {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -70px;
+  margin-left: 10px;
+  flex-wrap: wrap;
 }

@@ -5,6 +5,7 @@ import reset from './reset.png';
 import win from './youwon.png';
 import loss from './youlost.png';
 import draw from './draw.png';
+import blackjack from './blackjack.png';
 import './App.css';
 import React, { useState, useEffect, useRef} from 'react';
 
@@ -440,7 +441,13 @@ return (
     {!gameStarted ? (
       <div className="App">
         <div className="App-welcome-screen">
-        <h1>Welcome to Blackjack!</h1>
+         
+          <img src = {blackjack}
+          className={'App-welcome-word'}
+          alt = "blackjack"
+          style={{width: '350px', height : '350px'}}>
+          </img> 
+        
         <button onClick={() => setGameStarted(true)} className="App-start-button">
           Start Game
         </button>
