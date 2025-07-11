@@ -103,6 +103,7 @@ html, body {
   border-radius: 8px;
   cursor: pointer;
   margin-top: 20px;
+  margin-left: 170px;
 }
 
 .App-start-button:hover {
@@ -142,3 +143,21 @@ html, body {
   }
 }
 
+.App-welcome-screen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.6); /* fondo semitransparente opcional */
+  padding: 40px 50px;
+  border-radius: 15px;
+  color: white;
+}
+
+.App-welcome-screen h1 {
+  font-size: 48px;
+  margin-bottom: 30px;
+  color: white;
+}

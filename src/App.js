@@ -1,3 +1,4 @@
+import Confetti from 'react-confetti';
 import stand from './stand.png';
 import hit from './hit.png';
 import reset from './reset.png';
@@ -54,6 +55,9 @@ useEffect(() => {
 
   //Const for dealer turn finished
   const [dealerFinished, setDealerFinished] = useState(false);
+
+  //Const for confetti
+  const [showConfetti, setShowConfetti] = useState(false);
 
   //Starting cards for the user
   useEffect(() => {
@@ -171,6 +175,14 @@ useEffect(() => {
     playSound (src);
   }
 
+  //Confetti
+  if (playerWins || playerBlackjack || dealerBusted) {
+    setShowConfetti(true);
+    const timer = setTimeout(() => setShowConfetti(false), 5000);
+    return () => clearTimeout(timer);
+  } else {
+    setShowConfetti(false);
+  }
 }, [dealerFinished, value, dealerValue, choice]);
 
 // Card SFX
@@ -304,7 +316,7 @@ function renderGame() {
   return (
 
       <div className='App'>
-
+        {showConfetti && <Confetti />}
       <div className="white-box-container">
         <div className="white-box"></div>
         <div className="white-box"></div>
@@ -422,20 +434,17 @@ function renderGame() {
   );
 }
 
-
-
-
-
-
 //Return for the images of the cards and buttoms
 return (
   <>
     {!gameStarted ? (
       <div className="App">
+        <div className="App-welcome-screen">
         <h1>Welcome to Blackjack!</h1>
         <button onClick={() => setGameStarted(true)} className="App-start-button">
           Start Game
         </button>
+      </div>
       </div>
     ) : (
       renderGame()
