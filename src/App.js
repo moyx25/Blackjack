@@ -302,31 +302,44 @@ useEffect(() => {
 
 function renderGame() {
   return (
-      <div className='App'> 
+
+      <div className='App'>
+
+      <div className="white-box-container">
+        <div className="white-box"></div>
+        <div className="white-box"></div>
+      </div>
+      <div className="card-container">
       {cards.map((card, index) => (  //Return for user
+     
           <CardImage 
             key={index} 
             value={card.value} 
             symbol={card.symbol} 
             pos={index * 25} 
           />
+          
           ))}
-
+        </div>
       {choice
       ? dealerCards.length > 0 && (  //Initial return for dealer
+        <div className="card-container">
       <CardImageDealer
         value={dealerCards[0].value}
         symbol={dealerCards[0].symbol}
         pos={0}
       />
+      </div>
       )
        : dealerCards.map((card, index) => ( //Return dealer for the rest of the game
+        <div className="card-container">
       <CardImageDealer
         key={`dealer-${index}`}
         value={card.value}
         symbol={card.symbol}
         pos={index * 25}
       />
+      </div>
     ))}
       {choice && value < 21 ? (
         <>
@@ -408,6 +421,11 @@ function renderGame() {
     </div>
   );
 }
+
+
+
+
+
 
 //Return for the images of the cards and buttoms
 return (

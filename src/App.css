@@ -1,21 +1,38 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+}
 
-.App{
-  position: relative;
+.App {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 1280px;  /* o el ancho mínimo de tu layout ideal */
+  min-height: 585px;  /* ajusta si tu layout es más alto */
   background-image: url('./logo3.png');
   background-size: cover;
-  background-position: center;
+  background-position: top left;
   background-repeat: no-repeat;
-  height: 100vh;
-  overflow: hidden;
 }
+
 .App-logo {
   height: 10vmin;
   pointer-events: none;
 }
 
-.App-hit-bottom
-{
+.App-hit-bottom,
+.App-reset-bottom,
+.App-stand-bottom,
+.App-result-text,
+.App-card-user,
+.App-card-dealer {
   position: absolute;
+}
+
+.App-hit-bottom {
   top: 357px;
   left: 25%;
   transform: translateX(70px);
@@ -26,9 +43,7 @@
   cursor: pointer;
 }
 
-.App-reset-bottom
-{
-  position: absolute;
+.App-reset-bottom {
   top: 380px;
   left: 28%;
   transform: translateX(70px);
@@ -39,106 +54,47 @@
   cursor: pointer;
 }
 
-.App-stand-bottom
-{
-  position: absolute;
+.App-stand-bottom {
   top: 360px;
   left: 50%;
-  transform: translateX(-170px); /* mover hacia la izquierda desde el centro */
+  transform: translateX(-170px);
   width: 100px;
   height: 40px;
   background: none;
   border: none;
-  cursor: pointer;  
+  cursor: pointer;
 }
 
-.App-card-user
-{
-  position: absolute;
+.App-card-user {
   top: 380px;
   left: 50%;
   transform: translateX(-50%);
   height: 120px;
-  /*
-  display: flex;
-  position: absolute;
-  top: 380px;
-  width : 80px;
-  height: 120px; 
-  transition: opacity 1s ease-out; 
-  */
 }
 
-
-.App-cards-user.fade-out 
-{
+.App-cards-user.fade-out {
   opacity: 0;
 }
 
-.App-result-text
-{
-  position: absolute;
-  top: 230px;
+.App-result-text {
+  top: 220px;
   left: 44%;
   height: 150px;
-  /*
-  display: flex;
-  position: absolute;
-  top: 340px;
-  width : 80px;
-  height: 120px;
-  left : 415px;
-  font-weight: bold;
-  color : black;
-  font-size: 30px;
-  */
 }
 
-.App-card-dealer
-{
-  position: absolute;
+.App-card-dealer {
   top: 90px;
   left: 50%;
   transform: translateX(-50%);
   height: 120px;
-  /*
-  display: flex;
-  position: absolute;
-  top: 90px;
-  width : 80px;
-  height: 120px; 
-  transition: opacity 1s ease-out; 
-  */
 }
-
-html, body{
-  margin: 0;
-  padding: 0;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-/*
-.App-header {
-  background-color: #14648659;
-  min-height: 0vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-  */
 
 .App-link {
   color: #198ac3bd;
 }
 
 .App-start-button {
+  display: flex;
   padding: 12px 24px;
   font-size: 18px;
   background-color: #2e8b57;
@@ -148,6 +104,41 @@ html, body{
   cursor: pointer;
   margin-top: 20px;
 }
+
 .App-start-button:hover {
   background-color: #276644;
 }
+
+.white-box-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 110px;
+  margin-top: 60px;
+}
+
+.white-box {
+  width: 120px;
+  height: 170px;
+  border: 5px solid white;
+  border-radius: 10px;
+  background-color: transparent;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
