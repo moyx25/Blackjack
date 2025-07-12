@@ -23,7 +23,7 @@ useEffect(() => {
 
   for (const [key, src] of Object.entries(sounds)) {
     const audio = new Audio(src);
-    audio.load(); // precarga el audio
+    audio.load();
     audioCache.current[key] = audio;
   }
 }, []);
@@ -34,7 +34,7 @@ useEffect(() => {
     luigiSoundRef.current.currentTime = 0;
   }
 
-  // Usa el audio cacheado si existe
+  // Audio cache
   const cached = Object.values(audioCache.current).find(a => a.src.includes(src));
   const sound = cached ? cached.cloneNode() : new Audio(src);
 
@@ -84,8 +84,6 @@ useEffect(() => {
     setDealerCards(prev => [...prev, { value: val, symbol: symb }]);
   }, []);
 
-//Adjustment for A value
-
 //User
 useEffect(() => {
   let total = 0;
@@ -133,8 +131,8 @@ useEffect(() => {
 // Luigi Casino background music effect
 useEffect(() => {
   const luigiMusic = new Audio('/music/LuigiCasinoMusic.mp3');
-  luigiMusic.loop = true; // Loops music
-  luigiMusic.volume = 0.5; //Volume Level
+  luigiMusic.loop = true; 
+  luigiMusic.volume = 0.5; 
 
   // start the music on the first user click anywhere
   const playAudio = () => {
@@ -216,6 +214,8 @@ useEffect(() => {
   
 //Reset buttom
 const handleReset = () => {
+
+  setShowConfetti(false); // Stop confetti
  if (luigiSoundRef.current) {
   luigiSoundRef.current.pause();
   luigiSoundRef.current.currentTime = 0;
@@ -240,7 +240,7 @@ const handleReset = () => {
     { value: val2, symbol: symb2 }
   ]);
 
-  // Repartir carta al dealer
+  // Give card to the dealer
   let dealerVal = Math.floor(Math.random() * 13) + 1;
   let dealerSymb = Math.floor(Math.random() * 4);
   setDealerCount(1);
@@ -285,7 +285,7 @@ const handleStand = async () => {
       total += Math.min(val, 10);
     }
 
-    // Ajustar A's si es necesario
+    // Adjust aces
     while (total > 21 && aceCount > 0) {
       total -= 10;
       aceCount--;
@@ -295,7 +295,7 @@ const handleStand = async () => {
     setDealerCount(dealerHand.length);
   }
 
-  // Ajustar por última vez por si ya no entra al loop
+  // Adjust aces in more cases
   while (total > 21 && aceCount > 0) {
     total -= 10;
     aceCount--;
@@ -1829,4 +1829,5 @@ function CardImage({value, symbol, pos})
     )
    }
  }
+
  export default App;
