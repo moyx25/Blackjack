@@ -435,7 +435,7 @@ function renderGame() {
   );
 }
 
-//Return for the images of the cards and buttoms
+//Return for the menu
 return (
   <>
     {!gameStarted ? (

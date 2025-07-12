@@ -10,8 +10,8 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
-  min-width: 1280px;  /* o el ancho mínimo de tu layout ideal */
-  min-height: 585px;  /* ajusta si tu layout es más alto */
+  min-width: 1280px; 
+  min-height: 585px;
   background-image: url('./logo3.png');
   background-size: cover;
   background-position: top left;
